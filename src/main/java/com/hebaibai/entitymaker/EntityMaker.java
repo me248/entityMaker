@@ -3,12 +3,12 @@ package com.hebaibai.entitymaker;
 import com.hebaibai.entitymaker.model.EntityModel;
 import com.hebaibai.entitymaker.util.*;
 import com.mysql.jdbc.Connection;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +27,6 @@ public class EntityMaker {
 
     static final String FILE_TYPE = ".java";
 
-    static final String ENTITY_TEMPLET_PATH = "EntityTemp.ftl";
 
     static final String CONFIG_PATH = "config.xml";
 
@@ -51,22 +50,26 @@ public class EntityMaker {
      */
     private String basePath;
 
+    /**
+     * 生成文件的模板
+     */
+    private String entityTempletPath;
 
     /**
      * 生成entity
      *
-     * @param imports 需要导入的特殊的class
+     * @param importClassNames 需要导入的特殊的class
      */
-    public void maker(Class... imports) {
+    public void maker(String... importClassNames) {
         List<String> tableNames = showTables();
         for (String tableName : tableNames) {
             String createTableSql = getCreateTableSql(tableName);
             EntityModel entityModel = makeModelBySql(createTableSql);
-            for (Class importClass : imports) {
+            for (String importClass : importClassNames) {
                 entityModel.addImport(importClass);
             }
             boolean b = makeOneClass(entityModel);
-            System.out.printf("创建class：%-20s %-20s  %s \n", entityModel.getClassDoc(), tableName, b);
+            System.out.printf("创建class：%-20s %-20s  %s \n", tableName, b, entityModel.getClassDoc());
             Map<String, Class> fields = entityModel.getFields();
             for (Map.Entry<String, Class> entry : fields.entrySet()) {
                 System.out.printf("         字段：%-20s  %s \n", entry.getKey(), entry.getValue().getSimpleName());
@@ -106,7 +109,7 @@ public class EntityMaker {
             //字段注释是null的时候用数据库字段名作为注释
             model.addfieldDoc(fieldName, comment == null ? columnName : comment);
             model.addfieldSqlName(fieldName, columnName);
-            model.addImport(fieldClass);
+            model.addImport(fieldClass.getName());
         }
         return model;
     }
@@ -166,7 +169,7 @@ public class EntityMaker {
         entityModel.setPackageName(entityPackage);
         String filePath = basePath + "/" + entityPackage.replace(DOT, "/") + "/" + entityModel.getClassName() + FILE_TYPE;
         try {
-            String javaClassString = FreeMarkerUtils.getJavaClass(entityModel, ENTITY_TEMPLET_PATH);
+            String javaClassString = FreeMarkerUtils.getJavaClass(entityModel, entityTempletPath);
             FileUtils.write(filePath, javaClassString);
             return true;
         } catch (Exception e) {
@@ -183,6 +186,8 @@ public class EntityMaker {
         String password = element.getElementsByTagName("jdbc.password").item(0).getTextContent();
         String basePath = element.getElementsByTagName("basePath").item(0).getTextContent();
         String entityPackage = element.getElementsByTagName("entityPackage").item(0).getTextContent();
+        String entityTemplate = element.getElementsByTagName("entityTemplate").item(0).getTextContent();
+        this.entityTempletPath = entityTemplate;
         try {
             Connection conn = (Connection) DriverManager.getConnection(jdbcUrl, username, password);
             this.connection = conn;
@@ -209,9 +214,12 @@ public class EntityMaker {
         EntityMaker entityMaker = new EntityMaker();
         entityMaker.setColumnFieldTypeMapping(new ColumnFieldTypeMapping());
         entityMaker.maker(
-                Table.class,
-                Column.class,
-                Id.class
+                "com.hebaibai.jdbcplus.Table",
+                "com.hebaibai.jdbcplus.Id",
+                "com.hebaibai.jdbcplus.Column",
+                Getter.class.getName(),
+                Setter.class.getName(),
+                ToString.class.getName()
         );
     }
 

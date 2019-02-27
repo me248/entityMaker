@@ -2,7 +2,7 @@ package ${packageName};
 
 <#--导入的包-->
 <#list imports as import>
-import ${import.name};
+import ${import};
 </#list>
 
 <#--类名-->

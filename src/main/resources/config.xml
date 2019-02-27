@@ -1,7 +1,12 @@
 <xml>
-    <jdbc.url>jdbc:mysql://127.0.0.1:3306/demo1?useSSL=true</jdbc.url>
+    <!--<jdbc.url>jdbc:mysql://212.64.86.117:3306/wwwdb?useSSL=true</jdbc.url>-->
+    <!--<jdbc.username>wwwdb</jdbc.username>-->
+    <!--<jdbc.password><![CDATA[www!@#$%]]></jdbc.password>-->
+    <jdbc.url>jdbc:mysql://127.0.0.1:3306/demo0?useSSL=true</jdbc.url>
     <jdbc.username>debian-sys-maint</jdbc.username>
     <jdbc.password>cDjhZo5Tdul66r8E</jdbc.password>
     <basePath>/home/hjx/work/myProjectPlus/JdbcPlus/src/test/java</basePath>
     <entityPackage>com.hebaibai.jdbcplus.entity</entityPackage>
+    <!--生成实体类的模板路径-->
+    <entityTemplate>LombokEntityTemp.ftl</entityTemplate>
 </xml>

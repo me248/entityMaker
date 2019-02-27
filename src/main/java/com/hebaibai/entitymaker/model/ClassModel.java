@@ -1,30 +1,38 @@
 package com.hebaibai.entitymaker.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.*;
 
 /**
  * 用于生成java Entity文件的类
  */
+@Getter
+@Setter
+@ToString
 public class ClassModel {
 
     /**
      * java 中不需要引包的类型
      */
-    private static List<Class> baseClass = Arrays.asList(
-            int.class,
-            double.class,
-            float.class,
-            long.class,
-            short.class,
-            byte.class,
-            char.class,
-            boolean.class,
-            String.class
+    private static List<String> baseClass = Arrays.asList(
+            int.class.getName(),
+            double.class.getName(),
+            float.class.getName(),
+            long.class.getName(),
+            short.class.getName(),
+            byte.class.getName(),
+            char.class.getName(),
+            boolean.class.getName(),
+            String.class.getName()
     );
 
     /**
      * 类注释
      */
+
     private String classDoc;
 
     /**
@@ -49,19 +57,19 @@ public class ClassModel {
     private Map<String, String> fieldDoc = new HashMap<>();
     ;
 
-    private List<Class> imports = new ArrayList<>();
+    private List<String> imports = new ArrayList<>();
 
     /**
      * 添加需要导入的包
      *
-     * @param importClass
+     * @param className
      */
-    public void addImport(Class importClass) {
-        if (baseClass.indexOf(importClass) != -1) {
+    public void addImport(String className) {
+        if (baseClass.indexOf(className) != -1) {
             return;
         }
-        if (imports.indexOf(importClass) == -1) {
-            imports.add(importClass);
+        if (imports.indexOf(className) == -1) {
+            imports.add(className);
         }
     }
 
@@ -89,64 +97,5 @@ public class ClassModel {
         }
     }
 
-    public List<Class> getImports() {
-        return imports;
-    }
 
-    public void setImports(List<Class> imports) {
-        this.imports = imports;
-    }
-
-    public String getClassDoc() {
-        return classDoc;
-    }
-
-    public void setClassDoc(String classDoc) {
-        this.classDoc = classDoc;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public Map<String, Class> getFields() {
-        return fields;
-    }
-
-    public void setFields(Map<String, Class> fields) {
-        this.fields = fields;
-    }
-
-    public Map<String, String> getFieldDoc() {
-        return fieldDoc;
-    }
-
-    public void setFieldDoc(Map<String, String> fieldDoc) {
-        this.fieldDoc = fieldDoc;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("{");
-        sb.append("            \"classDoc\"=\"").append(classDoc).append('\"');
-        sb.append(",             \"className\"=\"").append(className).append('\"');
-        sb.append(",             \"packageName\"=\"").append(packageName).append('\"');
-        sb.append(",             \"fields\"=").append(fields);
-        sb.append(",             \"fieldDoc\"=").append(fieldDoc);
-        sb.append(",             \"imports\"=").append(imports);
-        sb.append('}');
-        return sb.toString();
-    }
 }
